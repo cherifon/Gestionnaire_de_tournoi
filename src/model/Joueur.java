@@ -28,6 +28,9 @@ public class Joueur extends Personne {
     }
 
     public void setNumeroMaillot(int numeroMaillot) {
+        if (numeroMaillot <= 0) { // Vérifier que le numéro de maillot est positif
+            throw new IllegalArgumentException("Le numéro de maillot doit être positif.");
+        }
         this.numeroMaillot = numeroMaillot;
     }
 
@@ -36,6 +39,9 @@ public class Joueur extends Personne {
     }
 
     public void setTitulaire(boolean titulaire) {
+        if (titulairesMaxAtteint() && titulaire) {
+            throw new IllegalStateException("L'équipe a déjà atteint le nombre maximum de titulaires.");
+        }
         this.titulaire = titulaire;
     }
 
@@ -43,7 +49,24 @@ public class Joueur extends Personne {
         return equipe;
     }
 
+    public void setEquipe(Equipe equipe) {
+        if (this.equipe != null) {
+            this.equipe.retirerJoueur(this); // Retirer le joueur de l'équipe actuelle
+        }
+        this.equipe = equipe;
+        if (equipe != null) {
+            equipe.ajouterJoueur(this); // Ajouter le joueur à la nouvelle équipe
+        }
+    }
+
     @Override
     public String toString() {
-        return super.toString() + ", equipe=" + equipe.getNom() + ", numeroMaillot=" + numeroMaillot + ", poste=" + poste;
+        return super.toString() + ", equipe=" + (equipe != null ? equipe.getNom() : "Sans équipe")
+                + ", numeroMaillot=" + numeroMaillot
+                + ", poste=" + poste;
+    }
+
+    private boolean titulairesMaxAtteint() {
+        return equipe != null && equipe.getTitulaires().length == 11;
+    }
 }

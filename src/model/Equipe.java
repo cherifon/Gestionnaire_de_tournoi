@@ -6,6 +6,7 @@ public class Equipe {
     private Joueur[] joueurs = new Joueur[15]; // 11 joueurs titulaires et 4 remplaçants
     private Entraineur entraineur;
     private static int[] statistiques = new int[3];
+    private Joueur[] titulaires = new Joueur[11];
 
     protected Equipe(String nom, Joueur[] joueurs, Entraineur entraineur) {
         this.nom = nom;
@@ -52,6 +53,10 @@ public class Equipe {
                 break;
             }
         }
+    }
+
+    public Joueur[] getTitulaires() {
+        return titulaires;
     }
 
     public String afficherStatistiques() {

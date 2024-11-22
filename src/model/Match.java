@@ -41,10 +41,20 @@ public class Match {
 
     public void jouerMatch() {
         int[] resultat = new int[2];
-        resultat[0] = (int) (Math.random() * 5);
+        resultat[0] = (int) (Math.random() * 5); // Score aléatoire entre 0 et 4
         resultat[1] = (int) (Math.random() * 5);
+
         setResultat(resultat);
         afficherResultat();
+
+        if (resultat[0] > resultat[1]) {
+            gangant = equipe1;
+        } else if (resultat[0] < resultat[1]) {
+            gangant = equipe2;
+        } else {
+            System.out.println("Match nul ! Aucun gagnant désigné.");
+            gangant = null; // Match nul
+        }
     }
 
     public Equipe getGangant() {

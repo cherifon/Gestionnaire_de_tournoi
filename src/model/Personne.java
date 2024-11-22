@@ -6,6 +6,16 @@ public abstract class Personne {
     private int age;
 
     protected Personne(String nom, String prenom, int age) {
+        if (nom == null || nom.trim().isEmpty()) { // Vérifier que le nom n'est pas vide (.trim() enlève les espaces en
+                                                   // début et fin de chaîne)
+            throw new IllegalArgumentException("Le nom ne peut pas être vide.");
+        }
+        if (prenom == null || prenom.trim().isEmpty()) {
+            throw new IllegalArgumentException("Le prénom ne peut pas être vide.");
+        }
+        if (age < 0) {
+            throw new IllegalArgumentException("L'âge doit être positif.");
+        }
         this.nom = nom;
         this.prenom = prenom;
         this.age = age;
@@ -16,6 +26,9 @@ public abstract class Personne {
     }
 
     public void setNom(String nom) {
+        if (nom == null || nom.trim().isEmpty()) {
+            throw new IllegalArgumentException("Le nom ne peut pas être vide.");
+        }
         this.nom = nom;
     }
 
@@ -32,6 +45,9 @@ public abstract class Personne {
     }
 
     public void setAge(int age) {
+        if (age < 0) {
+            throw new IllegalArgumentException("L'âge doit être positif.");
+        }
         this.age = age;
     }
 
