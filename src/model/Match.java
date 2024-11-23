@@ -39,7 +39,7 @@ public class Match {
         this.arbitre = arbitre;
     }
 
-    public void jouerMatch() {
+    public void jouerMatch() { // Pas de match nul pour le moment
         int[] resultat = new int[2];
         resultat[0] = (int) (Math.random() * 5); // Score aléatoire entre 0 et 4
         resultat[1] = (int) (Math.random() * 5);
@@ -49,14 +49,10 @@ public class Match {
 
         if (resultat[0] > resultat[1]) {
             gangant = equipe1;
-            System.out.println("L'équipe gagnante est " + gangant.getNom());
-        } else if (resultat[0] < resultat[1]) {
-            gangant = equipe2;
-            System.out.println("L'équipe gagnante est " + gangant.getNom());
         } else {
-            System.out.println("Match nul ! Aucun gagnant désigné.");
-            gangant = null; // Match nul
+            gangant = equipe2;
         }
+
     }
 
     public Equipe getGangant() {

@@ -1,17 +1,16 @@
 package model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class Competition {
     private String nom;
-    private static Match[] matches = new Match[16]; // ?? à revoir (penser en terme de pool)
-    private Equipe[] equipes = new Equipe[8];
+    private static Match[] matches = new Match[15];
+    private Equipe[] equipes = new Equipe[16];
     private Equipe champions;
 
-    public Competition(String nom, Match[] matches, Equipe[] equipes) {
+    public Competition(String nom, Equipe[] equipes) {
         this.nom = nom;
         this.equipes = equipes;
     }
@@ -55,10 +54,10 @@ public class Competition {
                     + " | Match nul (pas de gagnant).");
         }
         return gagnant;
+
     }
 
     public void jouerCompetition(List<Equipe> equipes) {
-        System.out.println("=== Début de la Compétition ===");
 
         // Vérifier que le nombre d'équipes est suffisant pour commencer la compétition
         if (equipes.size() < 8 || equipes.size() % 2 != 0) {
@@ -71,12 +70,10 @@ public class Competition {
 
         // Phase des Pools
         List<Equipe> qualifiés = new ArrayList<>();
-        System.out.println("=== Phase des Pools ===");
         for (int i = 0; i < equipes.size(); i += 2) {
             Equipe equipe1 = equipes.get(i);
             Equipe equipe2 = equipes.get(i + 1);
             Equipe gagnant = jouerMatch(equipe1, equipe2, 1); // Phase 1 : Pools
-            System.out.println("Gagnant du match : " + gagnant.getNom());
             qualifiés.add(gagnant);
         }
 
@@ -88,13 +85,11 @@ public class Competition {
         }
 
         // Phase des Quarts de Finale
-        System.out.println("=== Quarts de Finale ===");
         List<Equipe> demiFinalistes = new ArrayList<>();
         for (int i = 0; i < qualifiés.size(); i += 2) {
             Equipe equipe1 = qualifiés.get(i);
             Equipe equipe2 = qualifiés.get(i + 1);
             Equipe gagnant = jouerMatch(equipe1, equipe2, 2); // Phase 2 : Quarts
-            System.out.println("Gagnant du match : " + gagnant.getNom());
             demiFinalistes.add(gagnant);
         }
 
@@ -105,13 +100,11 @@ public class Competition {
         }
 
         // Phase des Demi-finales
-        System.out.println("=== Demi-finales ===");
         List<Equipe> finalistes = new ArrayList<>();
         for (int i = 0; i < demiFinalistes.size(); i += 2) {
             Equipe equipe1 = demiFinalistes.get(i);
             Equipe equipe2 = demiFinalistes.get(i + 1);
             Equipe gagnant = jouerMatch(equipe1, equipe2, 3); // Phase 3 : Demi-finales
-            System.out.println("Gagnant du match : " + gagnant.getNom());
             finalistes.add(gagnant);
         }
 
@@ -122,49 +115,38 @@ public class Competition {
         }
 
         // Finale
-        System.out.println("=== Finale ===");
         Equipe equipe1 = finalistes.get(0);
         Equipe equipe2 = finalistes.get(1);
         Equipe champion = jouerMatch(equipe1, equipe2, 4); // Phase 4 : Finale
-        System.out.println("=== Champion de la Compétition ===");
-        System.out.println("Le gagnant est : " + champion.getNom());
+
+        // Affichage en arbre des matches
+        afficherArbreDesMatches(equipes, qualifiés, demiFinalistes, finalistes, champion);
     }
 
-    // test unitaire
-    public static void main(String[] args) {
-        Joueur[] joueurs1 = new Joueur[15];
-        Joueur[] joueurs2 = new Joueur[15];
-        Joueur[] joueurs3 = new Joueur[15];
-        Joueur[] joueurs4 = new Joueur[15];
-        Joueur[] joueurs5 = new Joueur[15];
-        Joueur[] joueurs6 = new Joueur[15];
-        Joueur[] joueurs7 = new Joueur[15];
-        Joueur[] joueurs8 = new Joueur[15];
-
-        for (int i = 0; i < 15; i++) {
-            joueurs1[i] = new Joueur("Joueur1" + i, "Joueur1" + i, 20, "Attaquant", i + 1, true, null);
-            joueurs2[i] = new Joueur("Joueur2" + i, "Joueur2" + i, 20, "Défenseur", i + 1, true, null);
-            joueurs3[i] = new Joueur("Joueur3" + i, "Joueur3" + i, 20, "Milieu", i + 1, true, null);
-            joueurs4[i] = new Joueur("Joueur4" + i, "Joueur4" + i, 20, "Attaquant", i + 1, true, null);
-            joueurs5[i] = new Joueur("Joueur5" + i, "Joueur5" + i, 20, "Défenseur", i + 1, true, null);
-            joueurs6[i] = new Joueur("Joueur6" + i, "Joueur6" + i, 20, "Milieu", i + 1, true, null);
-            joueurs7[i] = new Joueur("Joueur7" + i, "Joueur7" + i, 20, "Attaquant", i + 1, true, null);
-            joueurs8[i] = new Joueur("Joueur8" + i, "Joueur8" + i, 20, "Défenseur", i + 1, true, null);
+    private void afficherArbreDesMatches(List<Equipe> equipes, List<Equipe> qualifiés, List<Equipe> demiFinalistes,
+            List<Equipe> finalistes, Equipe champion) {
+        System.out.println("\n=== Arbre des Matches ===");
+        System.out.println("Phase des Pools:");
+        for (int i = 0; i < equipes.size(); i += 2) {
+            System.out.println(equipes.get(i).getNom() + " vs " + equipes.get(i + 1).getNom() + " -> Gagnant: "
+                    + qualifiés.get(i / 2).getNom());
         }
 
-        Equipe equipe1 = new Equipe("Equipe1", joueurs1, null);
-        Equipe equipe2 = new Equipe("Equipe2", joueurs2, null);
-        Equipe equipe3 = new Equipe("Equipe3", joueurs3, null);
-        Equipe equipe4 = new Equipe("Equipe4", joueurs4, null);
-        Equipe equipe5 = new Equipe("Equipe5", joueurs5, null);
-        Equipe equipe6 = new Equipe("Equipe6", joueurs6, null);
-        Equipe equipe7 = new Equipe("Equipe7", joueurs7, null);
-        Equipe equipe8 = new Equipe("Equipe8", joueurs8, null);
+        System.out.println("\nQuarts de Finale:");
+        for (int i = 0; i < qualifiés.size(); i += 2) {
+            System.out.println(qualifiés.get(i).getNom() + " vs " + qualifiés.get(i + 1).getNom() + " -> Gagnant: "
+                    + demiFinalistes.get(i / 2).getNom());
+        }
 
-        List<Equipe> equipes = Arrays.asList(equipe1, equipe2, equipe3, equipe4, equipe5, equipe6, equipe7, equipe8);
+        System.out.println("\nDemi-finales:");
+        for (int i = 0; i < demiFinalistes.size(); i += 2) {
+            System.out.println(demiFinalistes.get(i).getNom() + " vs " + demiFinalistes.get(i + 1).getNom()
+                    + " -> Gagnant: " + finalistes.get(i / 2).getNom());
+        }
 
-        Competition competition = new Competition("Compétition de Test", matches, equipes.toArray(new Equipe[0]));
-        competition.jouerCompetition(equipes);
+        System.out.println("\nFinale:");
+        System.out.println(finalistes.get(0).getNom() + " vs " + finalistes.get(1).getNom() + " -> Champion: "
+                + champion.getNom());
     }
 
 }
