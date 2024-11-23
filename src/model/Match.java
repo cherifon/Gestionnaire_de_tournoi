@@ -8,7 +8,7 @@ public class Match {
     private int[] resultat = new int[2];
     private Equipe gangant;
 
-    protected Match(int tour, Equipe equipe1, Equipe equipe2, Arbitre arbitre) {
+    public Match(int tour, Equipe equipe1, Equipe equipe2, Arbitre arbitre) {
         this.tour = tour;
         this.equipe1 = equipe1;
         this.equipe2 = equipe2;
@@ -49,8 +49,10 @@ public class Match {
 
         if (resultat[0] > resultat[1]) {
             gangant = equipe1;
+            System.out.println("L'équipe gagnante est " + gangant.getNom());
         } else if (resultat[0] < resultat[1]) {
             gangant = equipe2;
+            System.out.println("L'équipe gagnante est " + gangant.getNom());
         } else {
             System.out.println("Match nul ! Aucun gagnant désigné.");
             gangant = null; // Match nul

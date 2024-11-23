@@ -6,7 +6,7 @@ public class Joueur extends Personne {
     private boolean titulaire;
     private Equipe equipe;
 
-    protected Joueur(String nom, String prenom, int age, String poste, int numeroMaillot, boolean titulaire,
+    public Joueur(String nom, String prenom, int age, String poste, int numeroMaillot, boolean titulaire,
             Equipe equipe) {
         super(nom, prenom, age);
         this.poste = poste;

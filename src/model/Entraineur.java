@@ -3,7 +3,7 @@ package model;
 public class Entraineur extends Personne {
     private Equipe equipe;
 
-    protected Entraineur(String nom, String prenom, int age, Equipe equipe) {
+    public Entraineur(String nom, String prenom, int age, Equipe equipe) {
         super(nom, prenom, age);
         this.equipe = equipe;
     }

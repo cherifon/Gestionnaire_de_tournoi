@@ -8,7 +8,7 @@ public class Equipe {
     private static int[] statistiques = new int[3];
     private Joueur[] titulaires = new Joueur[11];
 
-    protected Equipe(String nom, Joueur[] joueurs, Entraineur entraineur) {
+    public Equipe(String nom, Joueur[] joueurs, Entraineur entraineur) {
         this.nom = nom;
         this.joueurs = joueurs;
         this.entraineur = entraineur;

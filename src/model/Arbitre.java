@@ -4,7 +4,7 @@ public class Arbitre extends Personne {
 
     private String nationalite;
 
-    protected Arbitre(String nom, String prenom, int age, String nationalite) {
+    public Arbitre(String nom, String prenom, int age, String nationalite) {
         super(nom, prenom, age);
         this.nationalite = nationalite;
     }
