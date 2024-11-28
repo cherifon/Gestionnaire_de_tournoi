@@ -3,6 +3,7 @@ package database;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -30,6 +31,11 @@ public class DatabaseManager {
     }
 
     public static void createTables() {
+        String createEquipesTable = "CREATE TABLE IF NOT EXISTS equipes ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "nom TEXT NOT NULL"
+                + ");";
+
         String createJoueursTable = "CREATE TABLE IF NOT EXISTS joueurs ("
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + "nom TEXT NOT NULL,"
@@ -38,12 +44,8 @@ public class DatabaseManager {
                 + "position TEXT,"
                 + "numero INTEGER,"
                 + "titulaire BOOLEAN,"
-                + "equipe TEXT NOT NULL"
-                + ");";
-
-        String createEquipesTable = "CREATE TABLE IF NOT EXISTS equipes ("
-                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + "nom TEXT NOT NULL"
+                + "equipe_id INTEGER,"
+                + "FOREIGN KEY(equipe_id) REFERENCES equipes(id)"
                 + ");";
 
         String createArbitresTable = "CREATE TABLE IF NOT EXISTS arbitres ("
@@ -56,13 +58,14 @@ public class DatabaseManager {
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + "nom TEXT NOT NULL,"
                 + "prenom TEXT NOT NULL,"
-                + "equipe TEXT NOT NULL"
+                + "equipe_id INTEGER,"
+                + "FOREIGN KEY(equipe_id) REFERENCES equipes(id)"
                 + ");";
 
         try (Connection conn = connect();
              Statement stmt = conn.createStatement()) {
-            stmt.execute(createJoueursTable);
             stmt.execute(createEquipesTable);
+            stmt.execute(createJoueursTable);
             stmt.execute(createArbitresTable);
             stmt.execute(createEntraineursTable);
             System.out.println("Tables have been created.");
@@ -84,8 +87,8 @@ public class DatabaseManager {
         }
     }
 
-    public static void insertJoueur(String nom, String prenom, int age, String position, int numero, boolean titulaire, String equipe) {
-        String sql = "INSERT INTO joueurs(nom, prenom, age, position, numero, titulaire, equipe) VALUES(?,?,?,?,?,?,?)";
+    public static void insertJoueur(String nom, String prenom, int age, String position, int numero, boolean titulaire, int equipeId) {
+        String sql = "INSERT INTO joueurs(nom, prenom, age, position, numero, titulaire, equipe_id) VALUES(?,?,?,?,?,?,?)";
 
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -95,7 +98,7 @@ public class DatabaseManager {
             pstmt.setString(4, position);
             pstmt.setInt(5, numero);
             pstmt.setBoolean(6, titulaire);
-            pstmt.setString(7, equipe);
+            pstmt.setInt(7, equipeId);
             pstmt.executeUpdate();
             System.out.println("Joueur inséré avec succès.");
         } catch (SQLException e) {
@@ -117,18 +120,33 @@ public class DatabaseManager {
         }
     }
 
-    public static void insertEntraineur(String nom, String prenom, String equipe) {
-        String sql = "INSERT INTO entraineurs(nom, prenom, equipe) VALUES(?,?,?)";
+    public static void insertEntraineur(String nom, String prenom, int equipeId) {
+        String sql = "INSERT INTO entraineurs(nom, prenom, equipe_id) VALUES(?,?,?)";
 
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, nom);
             pstmt.setString(2, prenom);
-            pstmt.setString(3, equipe);
+            pstmt.setInt(3, equipeId);
             pstmt.executeUpdate();
             System.out.println("Entraîneur inséré avec succès.");
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    public static int getEquipeId(String nom) {
+        String sql = "SELECT id FROM equipes WHERE nom = ?";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, nom);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("id");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return -1; // Return -1 if the team is not found
     }
 }
