@@ -63,6 +63,22 @@ public class Equipe {
         return "Victoires: " + statistiques[0] + ", Défaites: " + statistiques[1] + ", Nuls: " + statistiques[2];
     }
 
+    public int getMatchesGagnes() {
+        return statistiques[0];
+    }
+
+    public int getMatchesPerdus() {
+        return statistiques[1];
+    }
+
+    public int getMatchesNuls() {
+        return statistiques[2];
+    }
+    
+    public Joueur[] getJoueurs() {
+        return joueurs;
+    }
+
     @Override
     public String toString() {
         return "nom=" + nom + ", entraineur=" + entraineur.getNom();
