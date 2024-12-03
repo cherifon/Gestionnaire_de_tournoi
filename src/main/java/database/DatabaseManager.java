@@ -9,10 +9,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import model.Joueur;
 
 public class DatabaseManager {
     private static final String URL = "jdbc:sqlite:src/main/ressources/competition.db";
@@ -191,15 +190,116 @@ public class DatabaseManager {
 
     public static void insertCompetition(String nom) {
         String sql = "INSERT INTO competitions(nom) VALUES(?)";
-
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, nom);
             pstmt.executeUpdate();
-            System.out.println("Compétition insérée avec succès.");
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
+    }
+    public static int getArbitreId(String nom, String prenom) {
+        String sql = "SELECT id FROM arbitres WHERE nom = ? AND prenom = ?";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, nom);
+            pstmt.setString(2, prenom);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("id");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return -1;
+    }
+    
+    public static Map<String, Integer> getEquipeStats(int equipeId) {
+        Map<String, Integer> stats = new HashMap<>();
+        stats.put("gagnes", 0);
+        stats.put("nuls", 0);
+        stats.put("perdus", 0);
+    
+        String sql = "SELECT COUNT(*) AS count, equipe_gagnante_id FROM matches WHERE equipe1_id = ? OR equipe2_id = ? GROUP BY equipe_gagnante_id";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, equipeId);
+            pstmt.setInt(2, equipeId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                int count = rs.getInt("count");
+                int gagnanteId = rs.getInt("equipe_gagnante_id");
+                if (gagnanteId == equipeId) {
+                    stats.put("gagnes", stats.get("gagnes") + count);
+                } else if (gagnanteId == 0) {
+                    stats.put("nuls", stats.get("nuls") + count);
+                } else {
+                    stats.put("perdus", stats.get("perdus") + count);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return stats;
+    }
+    
+    public static String getEntraineurNom(int equipeId) {
+        String sql = "SELECT nom, prenom FROM entraineurs WHERE equipe_id = ?";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, equipeId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("nom") + " " + rs.getString("prenom");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return "Inconnu";
+    }
+
+    public static List<Map<String, Object>> getJoueursByEquipe(int equipeId) {
+        List<Map<String, Object>> joueurs = new ArrayList<>();
+        String sql = "SELECT * FROM joueurs WHERE equipe_id = ?";
+    
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, equipeId);
+            ResultSet rs = pstmt.executeQuery();
+    
+            while (rs.next()) {
+                Map<String, Object> joueur = new LinkedHashMap<>();
+                joueur.put("id", rs.getInt("id"));
+                joueur.put("nom", rs.getString("nom"));
+                joueur.put("prenom", rs.getString("prenom"));
+                joueur.put("age", rs.getInt("age"));
+                joueur.put("poste", rs.getString("poste"));
+                joueur.put("numero", rs.getInt("numero"));
+                joueur.put("titulaire", rs.getBoolean("titulaire"));
+                joueur.put("equipe_id", rs.getInt("equipe_id"));
+                joueurs.add(joueur);
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    
+        return joueurs;
+    }
+    
+
+    public static int getCompetitionId(String nom) {
+        String sql = "SELECT id FROM competitions WHERE nom = ?";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, nom);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("id");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return -1;
     }
 
     public static int getEquipeId(String nom) {
@@ -232,20 +332,19 @@ public class DatabaseManager {
         return false;
     }
 
-    //==========================================Test==========================================
-        public static List<Map<String, Object>> getAllFromTable(String tableName) {
+    public static List<Map<String, Object>> getAllFromTable(String tableName) {
         List<Map<String, Object>> results = new ArrayList<>();
         String sql = "SELECT * FROM " + tableName;
-        
+    
         try (Connection conn = connect();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
-            
+    
             ResultSetMetaData metaData = rs.getMetaData();
             int columnCount = metaData.getColumnCount();
-            
+    
             while (rs.next()) {
-                Map<String, Object> row = new HashMap<>();
+                Map<String, Object> row = new LinkedHashMap<>(); // Utiliser LinkedHashMap au lieu de HashMap
                 for (int i = 1; i <= columnCount; i++) {
                     row.put(metaData.getColumnName(i), rs.getObject(i));
                 }
@@ -274,61 +373,6 @@ public class DatabaseManager {
         return names;
     }
 
-    public static List<Joueur> getJoueursByEquipe(int equipeId) {
-        List<Joueur> joueurs = new ArrayList<>();
-        String sql = "SELECT * FROM joueurs WHERE equipe_id = ?";
-        
-        try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setInt(1, equipeId);
-            ResultSet rs = pstmt.executeQuery();
-            
-            while (rs.next()) {
-                Joueur joueur = new Joueur(
-                    rs.getString("nom"),
-                    rs.getString("prenom"),
-                    rs.getInt("age"),
-                    rs.getString("poste"),
-                    rs.getInt("numero"),
-                    rs.getBoolean("titulaire"),
-                    null
-                );
-                joueurs.add(joueur);
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return joueurs;
-    }
-
-    public static void updateEquipe(int id, String nom) {
-        String sql = "UPDATE equipes SET nom = ? WHERE id = ?";
-        
-        try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setString(1, nom);
-            pstmt.setInt(2, id);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    public static void deleteEquipe(int id) {
-        String sql = "DELETE FROM equipes WHERE id = ?";
-        
-        try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setInt(1, id);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
     public static List<Map<String, Object>> searchInTable(String tableName, String columnName, String searchTerm) {
         List<Map<String, Object>> results = new ArrayList<>();
         String sql = "SELECT * FROM " + tableName + " WHERE " + columnName + " LIKE ?";
@@ -354,5 +398,134 @@ public class DatabaseManager {
         }
         return results;
     }
-    //==========================================Test==========================================
+
+    public static void deleteJoueur(int id) {
+        String sql = "DELETE FROM joueurs WHERE id = ?";
+        executeDelete(sql, id);
+    }
+    
+    public static void deleteArbitre(int id) {
+        String sql = "DELETE FROM arbitres WHERE id = ?";
+        executeDelete(sql, id);
+    }
+    
+    public static void deleteEntraineur(int id) {
+        String sql = "DELETE FROM entraineurs WHERE id = ?";
+        executeDelete(sql, id);
+    }
+    
+    public static void deleteEquipe(int id) {
+        try (Connection conn = connect()) {
+            conn.setAutoCommit(false);
+            try {
+                // Delete associated players
+                String deleteJoueurs = "DELETE FROM joueurs WHERE equipe_id = ?";
+                try (PreparedStatement pstmt = conn.prepareStatement(deleteJoueurs)) {
+                    pstmt.setInt(1, id);
+                    pstmt.executeUpdate();
+                }
+    
+                // Delete associated coach
+                String deleteEntraineur = "DELETE FROM entraineurs WHERE equipe_id = ?";
+                try (PreparedStatement pstmt = conn.prepareStatement(deleteEntraineur)) {
+                    pstmt.setInt(1, id);
+                    pstmt.executeUpdate();
+                }
+    
+                // Delete team
+                String deleteEquipe = "DELETE FROM equipes WHERE id = ?";
+                try (PreparedStatement pstmt = conn.prepareStatement(deleteEquipe)) {
+                    pstmt.setInt(1, id);
+                    pstmt.executeUpdate();
+                }
+    
+                conn.commit();
+                System.out.println("Équipe et données associées supprimées avec succès.");
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+    
+    private static void executeDelete(String sql, int id) {
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+            System.out.println("Élément supprimé avec succès.");
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static boolean updateEquipe(int id, String nom) {
+        String sql = "UPDATE equipes SET nom = ? WHERE id = ?";
+        try (Connection conn = connect();
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, nom);
+            pstmt.setInt(2, id);
+            int affected = pstmt.executeUpdate();
+            return affected > 0;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
+    public static boolean updateJoueur(int id, String nom, String prenom, int age, 
+        String position, int numero, boolean titulaire, int equipeId) {
+        String sql = "UPDATE joueurs SET nom = ?, prenom = ?, age = ?, position = ?, " +
+                    "numero = ?, titulaire = ?, equipe_id = ? WHERE id = ?";
+        try (Connection conn = connect();
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, nom);
+            pstmt.setString(2, prenom);
+            pstmt.setInt(3, age);
+            pstmt.setString(4, position);
+            pstmt.setInt(5, numero);
+            pstmt.setBoolean(6, titulaire);
+            pstmt.setInt(7, equipeId);
+            pstmt.setInt(8, id);
+            int affected = pstmt.executeUpdate();
+            return affected > 0;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
+    public static boolean updateArbitre(int id, String nom, String prenom, String nationalite) {
+        String sql = "UPDATE arbitres SET nom = ?, prenom = ?, nationalite = ? WHERE id = ?";
+        try (Connection conn = connect();
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, nom);
+            pstmt.setString(2, prenom);
+            pstmt.setString(3, nationalite);
+            pstmt.setInt(4, id);
+            int affected = pstmt.executeUpdate();
+            return affected > 0;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
+    public static boolean updateEntraineur(int id, String nom, String prenom, int equipeId) {
+        String sql = "UPDATE entraineurs SET nom = ?, prenom = ?, equipe_id = ? WHERE id = ?";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, nom);
+            pstmt.setString(2, prenom);
+            pstmt.setInt(3, equipeId);
+            pstmt.setInt(4, id);
+            int affected = pstmt.executeUpdate();
+            return affected > 0;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
 }
