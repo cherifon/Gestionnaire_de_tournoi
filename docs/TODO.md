@@ -1,6 +1,0 @@
-- Changer l'interface utilisateur :
-  - Utiliser Javafx au lieu de javax
-  - Utiliser des fichiers css pour amméliorer l'interface graphique
-- Corriger l'UML en fonction du cours que la prof à fait en cours :
-  - Si je détruit mon equipe, mon entraineur ne sera pas détruit
-  - Ajouter les les sens (uni ou bidirectionnesl) entre les classes
