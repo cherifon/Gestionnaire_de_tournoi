@@ -35,13 +35,13 @@ public class Competition {
         return champions;
     }
 
-    private static Equipe jouerMatch(Equipe equipe1, Equipe equipe2, int tour) {
+    private static Equipe jouerMatch(Equipe equipe1, Equipe equipe2, int tour, Arbitre arbitre) {
         if (equipe1 == null || equipe2 == null) {
             System.out.println("Match impossible : une des équipes est manquante.");
             return null;
         }
 
-        Match match = new Match(tour, equipe1, equipe2, null);
+        Match match = new Match(tour, equipe1, equipe2, arbitre);
         match.jouerMatch();
         matches[tour] = match;
 
@@ -50,7 +50,7 @@ public class Competition {
             System.out.println("Tour " + tour + ": " + equipe1.getNom() + " vs " + equipe2.getNom()
                     + " | Gagnant : " + gagnant.getNom());
         } else {
-            System.out.println("Tour " + tour + ": " + equipe1.getNom() + " vs " + equipe2.getNom()
+            System.out.println("Tour " + tour + ": " + equipe1.getNom() + " vs " + equipe2.getNom() //On a supposé ici que le match ne peut pas être nul
                     + " | Match nul (pas de gagnant).");
         }
         return gagnant;
@@ -73,7 +73,7 @@ public class Competition {
         for (int i = 0; i < equipes.size(); i += 2) {
             Equipe equipe1 = equipes.get(i);
             Equipe equipe2 = equipes.get(i + 1);
-            Equipe gagnant = jouerMatch(equipe1, equipe2, 1); // Phase 1 : Pools
+            Equipe gagnant = jouerMatch(equipe1, equipe2, 1, null); // Phase 1 : Pools
             qualifiés.add(gagnant);
         }
 
@@ -89,7 +89,7 @@ public class Competition {
         for (int i = 0; i < qualifiés.size(); i += 2) {
             Equipe equipe1 = qualifiés.get(i);
             Equipe equipe2 = qualifiés.get(i + 1);
-            Equipe gagnant = jouerMatch(equipe1, equipe2, 2); // Phase 2 : Quarts
+            Equipe gagnant = jouerMatch(equipe1, equipe2, 2, null); // Phase 2 : Quarts
             demiFinalistes.add(gagnant);
         }
 
@@ -104,7 +104,7 @@ public class Competition {
         for (int i = 0; i < demiFinalistes.size(); i += 2) {
             Equipe equipe1 = demiFinalistes.get(i);
             Equipe equipe2 = demiFinalistes.get(i + 1);
-            Equipe gagnant = jouerMatch(equipe1, equipe2, 3); // Phase 3 : Demi-finales
+            Equipe gagnant = jouerMatch(equipe1, equipe2, 3, null); // Phase 3 : Demi-finales
             finalistes.add(gagnant);
         }
 
@@ -117,7 +117,7 @@ public class Competition {
         // Finale
         Equipe equipe1 = finalistes.get(0);
         Equipe equipe2 = finalistes.get(1);
-        Equipe champion = jouerMatch(equipe1, equipe2, 4); // Phase 4 : Finale
+        Equipe champion = jouerMatch(equipe1, equipe2, 4, null); // Phase 4 : Finale
 
         // Affichage en arbre des matches
         afficherArbreDesMatches(equipes, qualifiés, demiFinalistes, finalistes, champion);
