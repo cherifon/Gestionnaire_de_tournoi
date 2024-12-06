@@ -13,6 +13,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import model.Arbitre;
+import model.Entraineur;
+import model.Equipe;
+import model.Joueur;
+
 public class DatabaseManager {
     private static final String URL = "jdbc:sqlite:src/main/ressources/competition.db";
 
@@ -528,4 +533,161 @@ public class DatabaseManager {
             return false;
         }
     }
+
+
+    //=======================================Partie instanciation et récupération des données=======================================
+    public static boolean hasRequiredData() {
+        String sql = "SELECT COUNT(*) AS count FROM equipes";
+        try (Connection conn = connect();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next() && rs.getInt("count") == 16) {
+                sql = "SELECT equipe_id, COUNT(*) AS count FROM joueurs GROUP BY equipe_id HAVING count >= 11";
+                try (PreparedStatement pstmt = conn.prepareStatement(sql);
+                     ResultSet rs2 = pstmt.executeQuery()) {
+                    int validTeams = 0;
+                    while (rs2.next()) {
+                        validTeams++;
+                    }
+                    return validTeams == 16;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return false;
+    }
+
+    public static List<Joueur> loadJoueurs() {
+        List<Joueur> joueurs = new ArrayList<>();
+        String sql = "SELECT * FROM joueurs";
+        try (Connection conn = connect();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                Joueur joueur = new Joueur(
+                    rs.getString("nom"),
+                    rs.getString("prenom"),
+                    rs.getInt("age"),
+                    rs.getString("poste"),
+                    rs.getInt("numero"),
+                    rs.getBoolean("titulaire"),
+                    null // L'équipe sera définie après
+                );
+                joueurs.add(joueur);
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return joueurs;
+    }
+
+    public static List<Arbitre> loadArbitres() {
+        List<Arbitre> arbitres = new ArrayList<>();
+        String sql = "SELECT * FROM arbitres";
+        try (Connection conn = connect();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                Arbitre arbitre = new Arbitre(
+                    rs.getString("nom"),
+                    rs.getString("prenom"),
+                    rs.getInt("age"),
+                    rs.getString("nationalite")
+                );
+                arbitres.add(arbitre);
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return arbitres;
+    }
+
+    public static List<Entraineur> loadEntraineurs() {
+        List<Entraineur> entraineurs = new ArrayList<>();
+        String sql = "SELECT * FROM entraineurs";
+        try (Connection conn = connect();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                Entraineur entraineur = new Entraineur(
+                    rs.getString("nom"),
+                    rs.getString("prenom"),
+                    rs.getInt("age"),
+                    null // L'équipe sera définie après
+                );
+                entraineurs.add(entraineur);
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return entraineurs;
+    }
+
+    public static List<Equipe> loadEquipes() {
+        List<Equipe> equipes = new ArrayList<>();
+        String sql = "SELECT * FROM equipes";
+        try (Connection conn = connect();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                Equipe equipe = new Equipe(
+                    rs.getString("nom"),
+                    loadJoueursByEquipe(rs.getInt("id")).toArray(new Joueur[0]),
+                    loadEntraineurByEquipe(rs.getInt("id"))
+                );
+                equipes.add(equipe);
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return equipes;
+    }
+
+    public static List<Joueur> loadJoueursByEquipe(int equipeId) {
+        List<Joueur> joueurs = new ArrayList<>();
+        String sql = "SELECT * FROM joueurs WHERE equipe_id = ?";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, equipeId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Joueur joueur = new Joueur(
+                    rs.getString("nom"),
+                    rs.getString("prenom"),
+                    rs.getInt("age"),
+                    rs.getString("poste"),
+                    rs.getInt("numero"),
+                    rs.getBoolean("titulaire"),
+                    null // L'équipe sera définie après
+                );
+                joueurs.add(joueur);
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return joueurs;
+    }
+
+    public static Entraineur loadEntraineurByEquipe(int equipeId) {
+        Entraineur entraineur = null;
+        String sql = "SELECT * FROM entraineurs WHERE equipe_id = ?";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, equipeId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                entraineur = new Entraineur(
+                    rs.getString("nom"),
+                    rs.getString("prenom"),
+                    rs.getInt("age"),
+                    null // L'équipe sera définie après
+                );
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return entraineur;
+    }
+    //=======================================Partie instanciation et récupération des données=======================================
 }
