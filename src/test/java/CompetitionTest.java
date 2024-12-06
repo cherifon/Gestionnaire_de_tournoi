@@ -66,5 +66,10 @@ public class CompetitionTest {
 
         Competition competition = new Competition("Compétition de Test", equipes.toArray(new Equipe[0]));
         competition.jouerCompetition(equipes);
+
+        //Afficher les statistiques de chaque equipe
+        for (Equipe equipe : equipes) {
+            System.out.println(equipe.getNom() + " : " + equipe.afficherStatistiques());
+        }
     }
 }
