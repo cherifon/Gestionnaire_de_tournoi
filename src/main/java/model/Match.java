@@ -39,7 +39,7 @@ public class Match {
         this.arbitre = arbitre;
     }
 
-    public void jouerMatch() { // Pas de match nul pour le moment
+    public void jouerMatch() { // Pas de match nul
         int[] resultat = new int[2];
         resultat[0] = (int) (Math.random() * 5); // Score aléatoire entre 0 et 4
         resultat[1] = (int) (Math.random() * 5);
@@ -49,8 +49,12 @@ public class Match {
 
         if (resultat[0] > resultat[1]) {
             gangant = equipe1;
+            equipe1.ajouterVictoire();
+            equipe2.ajouterDefaite();
         } else {
             gangant = equipe2;
+            equipe2.ajouterVictoire();
+            equipe1.ajouterDefaite();
         }
 
     }

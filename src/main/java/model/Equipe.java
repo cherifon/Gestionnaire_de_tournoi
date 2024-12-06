@@ -63,16 +63,16 @@ public class Equipe {
         return "Victoires: " + statistiques[0] + ", Défaites: " + statistiques[1] + ", Nuls: " + statistiques[2];
     }
 
-    public int getMatchesGagnes() {
-        return statistiques[0];
+    public void ajouterVictoire() {
+        statistiques[0]++;
     }
 
-    public int getMatchesPerdus() {
-        return statistiques[1];
+    public void ajouterDefaite() {
+        statistiques[1]++;
     }
 
-    public int getMatchesNuls() {
-        return statistiques[2];
+    public void ajouterNul() {
+        statistiques[2]++;
     }
     
     public Joueur[] getJoueurs() {
