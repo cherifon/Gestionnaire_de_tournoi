@@ -1,4 +1,6 @@
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import model.Competition;
@@ -64,10 +66,19 @@ public class CompetitionTest {
         List<Equipe> equipes = Arrays.asList(equipe1, equipe2, equipe3, equipe4, equipe5, equipe6, equipe7, equipe8,
                 equipe9, equipe10, equipe11, equipe12, equipe13, equipe14, equipe15, equipe16);
 
-        Competition competition = new Competition("Compétition de Test", equipes.toArray(new Equipe[0]));
+        Competition competition = new Competition("Compétition de Test", equipes.toArray(new Equipe[0]), null);
         competition.jouerCompetition(equipes);
 
-        //Afficher les statistiques de chaque equipe
+        // Trier les équipes par ordre decroissant de victoires
+        Collections.sort(equipes, new Comparator<Equipe>() { // comparator est une interface qui permet de comparer deux
+                                                             // objets
+            @Override
+            public int compare(Equipe equipe1, Equipe equipe2) { // compare est une méthode de l'interface Comparator
+                return equipe2.getVictoires() - equipe1.getVictoires(); // compare les victoires des deux équipes
+            }
+        });
+
+        // Afficher les statistiques de chaque équipe par ordre croissant de victoires
         for (Equipe equipe : equipes) {
             System.out.println(equipe.getNom() + " : " + equipe.afficherStatistiques());
         }
