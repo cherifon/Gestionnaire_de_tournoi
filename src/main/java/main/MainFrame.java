@@ -16,16 +16,15 @@ import model.Joueur;
 public class MainFrame extends JFrame {
     private JTabbedPane tabbedPane;
 
-    public MainFrame() {
+    public MainFrame(Competition competition, List<Equipe> equipes) {
         setTitle("Gestionnaire de Tournoi");
         setSize(1000, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        int nbMatchesDivisePar15 = DatabaseManager.getMatchCount() / 15;
         tabbedPane = new JTabbedPane();
 
         // Ajout des différents panels
-        tabbedPane.addTab("Compétition", new CompetitionPanel());
-        tabbedPane.addTab("Équipes", new TeamPanel());
+        tabbedPane.addTab("Compétition", new CompetitionPanel(competition, equipes, nbMatchesDivisePar15 + 1));
         tabbedPane.addTab("Arbitres", new RefereePanel());
         tabbedPane.addTab("Joueurs", new PlayerPanel());
         tabbedPane.addTab("Matches", new GamePanel());
@@ -37,39 +36,43 @@ public class MainFrame extends JFrame {
     public static void main(String[] args) {
         DatabaseManager.createTables();
 
-        if (DatabaseManager.hasRequiredData()) {
-            // Charger les données depuis la base de données
-            List<Joueur> joueurs = DatabaseManager.loadJoueurs();
-            List<Arbitre> arbitres = DatabaseManager.loadArbitres();
-            List<Entraineur> entraineurs = DatabaseManager.loadEntraineurs();
-            List<Equipe> equipes = DatabaseManager.loadEquipes();
+        int matchCount = DatabaseManager.getMatchCount();
+        int competitionId = matchCount / 15 + 1;
 
-            // Initialiser les instances de classes
-            for (Joueur joueur : joueurs) {
-                new Joueur(joueur.getNom(), joueur.getPrenom(), joueur.getAge(), joueur.getPoste(), joueur.getNumeroMaillot(), joueur.isTitulaire(), joueur.getEquipe());
-                System.out.println(joueur.getNom());
-            }
-            for (Arbitre arbitre : arbitres) {
-                new Arbitre(arbitre.getNom(), arbitre.getPrenom(), arbitre.getAge(), arbitre.getNationalite());
-                System.out.println(arbitre.getNom());
-            }
-            for (Entraineur entraineur : entraineurs) {
-                new Entraineur(entraineur.getNom(), entraineur.getPrenom(), entraineur.getAge(), entraineur.getEquipe());
-                System.out.println(entraineur.getNom());
-            }
-
-            // Créer la compétition avec les équipes chargées
-            Competition competition = new Competition("Compétition de Football", equipes.toArray(new Equipe[0]));
-            System.out.println("La compétition " + competition.getNom() + " a été créée.");
-
-            // Jouer la compétition et afficher les résultats
-            competition.jouerCompetition(equipes);
-        } else {
-            System.out.println("La base de données ne contient pas les données requises.");
+        // Créer une nouvelle compétition avec l'ID (le nombre de matchs divisé 15) Si
+        // l'id de la competition n'existe pas
+        if (DatabaseManager.getCompetition(competitionId) <= 0) {
+            DatabaseManager.insertCompetitionWithId(competitionId, "Compétition de Football");
         }
 
+        // Charger les données depuis la base de données
+        List<Joueur> joueurs = DatabaseManager.loadJoueurs();
+        List<Arbitre> arbitres = DatabaseManager.getAllArbitres();
+        List<Entraineur> entraineurs = DatabaseManager.loadEntraineurs();
+        List<Equipe> equipes = DatabaseManager.getAllEquipes();
+
+        // Initialiser les instances de classes
+        for (Joueur joueur : joueurs) {
+            new Joueur(joueur.getNom(), joueur.getPrenom(), joueur.getAge(), joueur.getPoste(),
+                    joueur.getNumeroMaillot(), joueur.isTitulaire(), joueur.getEquipe());
+            System.out.println(joueur.getNom());
+        }
+        for (Arbitre arbitre : arbitres) {
+            new Arbitre(arbitre.getNom(), arbitre.getPrenom(), arbitre.getAge(), arbitre.getNationalite());
+            System.out.println(arbitre.getNom());
+        }
+        for (Entraineur entraineur : entraineurs) {
+            new Entraineur(entraineur.getNom(), entraineur.getPrenom(), entraineur.getAge(),
+                    entraineur.getEquipe());
+            System.out.println(entraineur.getNom());
+        }
+
+        // Créer la compétition avec les équipes chargées
+        Competition competition = new Competition("Compétition de Football", equipes.toArray(new Equipe[0]), arbitres);
+        System.out.println("La compétition " + competition.getNom() + " a été créée.");
+
         SwingUtilities.invokeLater(() -> {
-            new MainFrame().setVisible(true);
+            new MainFrame(competition, equipes).setVisible(true);
         });
     }
 }
