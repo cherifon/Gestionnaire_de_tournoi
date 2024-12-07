@@ -7,66 +7,78 @@ import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
 import database.DatabaseManager;
+import utils.StyleUtilities;
 
 public class GamePanel extends JPanel {
-    private JComboBox<String> competitionSelect;
-    private JPanel matchesPanel;
-    private JTextArea resultsArea;
+    private JPanel matchPanel;
 
     public GamePanel() {
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(10, 10));
+        StyleUtilities.stylePanel(this);
 
-        // Sélection de la compétition
-        JPanel headerPanel = new JPanel(new FlowLayout());
-        competitionSelect = new JComboBox<>();
-        JButton startButton = new JButton("Démarrer la compétition");
-        headerPanel.add(new JLabel("Sélectionner une compétition:"));
-        headerPanel.add(competitionSelect);
-        headerPanel.add(startButton);
+        // Panel titre
+        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        StyleUtilities.stylePanel(titlePanel);
+        JLabel titleLabel = new JLabel("Historique des Matches");
+        titleLabel.setFont(StyleUtilities.TITLE_FONT);
+        titlePanel.add(titleLabel);
 
-        // Panel des matches
-        matchesPanel = new JPanel();
-        matchesPanel.setLayout(new BoxLayout(matchesPanel, BoxLayout.Y_AXIS));
+        // Panel pour afficher les matchs
+        matchPanel = new JPanel();
+        matchPanel.setLayout(new BoxLayout(matchPanel, BoxLayout.Y_AXIS));
+        JScrollPane matchScrollPane = new JScrollPane(matchPanel);
 
-        // Zone de résultats
-        resultsArea = new JTextArea();
-        resultsArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(resultsArea);
+        // Bouton pour rafraîchir les matchs
+        JButton refreshButton = new JButton("Rafraîchir");
+        StyleUtilities.styleButton(refreshButton);
+        refreshButton.addActionListener(e -> refreshMatchPanel());
 
-        startButton.addActionListener(e -> startCompetition());
+        add(titlePanel, BorderLayout.NORTH);
+        add(matchScrollPane, BorderLayout.CENTER);
+        add(refreshButton, BorderLayout.SOUTH);
 
-        loadCompetitions();
-
-        add(headerPanel, BorderLayout.NORTH);
-        add(matchesPanel, BorderLayout.CENTER);
-        add(scrollPane, BorderLayout.SOUTH);
+        refreshMatchPanel();
     }
 
-    private void loadCompetitions() {
-        competitionSelect.removeAllItems();
-        List<Map<String, Object>> competitions = DatabaseManager.getAllFromTable("competitions");
-        for (Map<String, Object> competition : competitions) {
-            competitionSelect.addItem(competition.get("nom").toString());
-        }
-    }
+    private void refreshMatchPanel() {
+        matchPanel.removeAll();
+        List<Map<String, Object>> matches = DatabaseManager.getAllFromTable("matchs");
 
-    private void startCompetition() {
-        String competitionName = (String) competitionSelect.getSelectedItem();
-        if (competitionName == null) {
-            JOptionPane.showMessageDialog(this, "Veuillez sélectionner une compétition");
-            return;
+        for (Map<String, Object> match : matches) {
+            JPanel matchInfoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            StyleUtilities.stylePanel(matchInfoPanel);
+
+            String equipe1Nom = match.get("equipe1_id") != null
+                    ? DatabaseManager.getEquipeNom(Integer.parseInt(match.get("equipe1_id").toString()))
+                    : "N/A";
+            String equipe2Nom = match.get("equipe2_id") != null
+                    ? DatabaseManager.getEquipeNom(Integer.parseInt(match.get("equipe2_id").toString()))
+                    : "N/A";
+            int scoreEquipe1 = match.get("score_equipe1") != null
+                    ? Integer.parseInt(match.get("score_equipe1").toString())
+                    : 0;
+            int scoreEquipe2 = match.get("score_equipe2") != null
+                    ? Integer.parseInt(match.get("score_equipe2").toString())
+                    : 0;
+            String arbitreNom = match.get("arbitre_nom") != null ? match.get("arbitre_nom").toString() : "N/A";
+            String gagnantNom = match.get("equipe_gagnante_id") != null
+                    ? DatabaseManager.getEquipeNom(Integer.parseInt(match.get("equipe_gagnante_id").toString()))
+                    : "N/A";
+
+            JLabel matchLabel = new JLabel(String.format("%s %d - %d %s (Arbitre: %s, Gagnant: %s)",
+                    equipe1Nom, scoreEquipe1, scoreEquipe2, equipe2Nom, arbitreNom, gagnantNom));
+            matchLabel.setFont(StyleUtilities.REGULAR_FONT);
+            matchInfoPanel.add(matchLabel);
+
+            matchPanel.add(matchInfoPanel);
         }
 
-        // Logique pour démarrer la compétition et afficher les résultats
-        resultsArea.setText("Résultats de la compétition " + competitionName + ":\n");
-        // Ajouter la logique pour jouer les matches et afficher les résultats
+        matchPanel.revalidate();
+        matchPanel.repaint();
     }
 }
