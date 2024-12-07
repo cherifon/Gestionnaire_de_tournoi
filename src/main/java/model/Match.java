@@ -6,7 +6,7 @@ public class Match {
     private Equipe equipe2;
     private Arbitre arbitre;
     private int[] resultat = new int[2];
-    private Equipe gangant;
+    private Equipe gagnant;
 
     public Match(int tour, Equipe equipe1, Equipe equipe2, Arbitre arbitre) {
         this.tour = tour;
@@ -31,6 +31,18 @@ public class Match {
         return equipe1.getNom() + " vs " + equipe2.getNom();
     }
 
+    public Equipe getEquipe1() {
+        return equipe1;
+    }
+
+    public Equipe getEquipe2() {
+        return equipe2;
+    }
+
+    public int[] getResultat() {
+        return resultat;
+    }
+
     public Arbitre getArbitre() {
         return arbitre;
     }
@@ -39,27 +51,28 @@ public class Match {
         this.arbitre = arbitre;
     }
 
-    public void jouerMatch() { // Pas de match nul
+    public void jouerMatch() {
         int[] resultat = new int[2];
-        resultat[0] = (int) (Math.random() * 5); // Score aléatoire entre 0 et 4
-        resultat[1] = (int) (Math.random() * 5);
+        do {
+            resultat[0] = (int) (Math.random() * 5); // Score aléatoire entre 0 et 4
+            resultat[1] = (int) (Math.random() * 5);
+        } while (resultat[0] == resultat[1]); // Assurer qu'il n'y a pas de match nul
 
         setResultat(resultat);
         afficherResultat();
 
         if (resultat[0] > resultat[1]) {
-            gangant = equipe1;
+            gagnant = equipe1;
             equipe1.ajouterVictoire();
             equipe2.ajouterDefaite();
         } else {
-            gangant = equipe2;
+            gagnant = equipe2;
             equipe2.ajouterVictoire();
             equipe1.ajouterDefaite();
         }
-
     }
 
-    public Equipe getGangant() {
-        return gangant;
+    public Equipe getGagnant() {
+        return gagnant;
     }
 }
