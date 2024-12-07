@@ -5,7 +5,8 @@ public class Equipe {
     private String nom;
     private Joueur[] joueurs = new Joueur[15]; // 11 joueurs titulaires et 4 remplaçants
     private Entraineur entraineur;
-    private static int[] statistiques = new int[3];
+    private int victoires;
+    private int defaites;
     private Joueur[] titulaires = new Joueur[11];
 
     public Equipe(String nom, Joueur[] joueurs, Entraineur entraineur) {
@@ -60,23 +61,27 @@ public class Equipe {
     }
 
     public String afficherStatistiques() {
-        return "Victoires: " + statistiques[0] + ", Défaites: " + statistiques[1] + ", Nuls: " + statistiques[2];
+        return "Victoires: " + victoires + ", Défaites: " + defaites;
     }
 
     public void ajouterVictoire() {
-        statistiques[0]++;
+        victoires++;
     }
 
     public void ajouterDefaite() {
-        statistiques[1]++;
+        defaites++;
     }
 
-    public void ajouterNul() {
-        statistiques[2]++;
-    }
-    
     public Joueur[] getJoueurs() {
         return joueurs;
+    }
+
+    public int getVictoires() {
+        return victoires;
+    }
+
+    public int getDefaites() {
+        return defaites;
     }
 
     @Override
