@@ -1,3 +1,14 @@
+/*
+ * Projet : Gestionnaire de Tournoi
+ * Auteur : Cherif Jebali
+ * Date : 8 décembre  2024
+ * Description : Ce fichier fait partie du projet de gestion de tournoi.
+ *               Il contient la classe Joueur qui représente un joueur de football.
+ * 
+ * Ce code a été écrit par Cherif Jebali pour le projet de gestion de tournoi.
+ * Vous pouvez utiliser ce code pour votre propre projet ou le modifier.
+ */
+
 package model;
 
 public class Joueur extends Personne {
@@ -6,9 +17,8 @@ public class Joueur extends Personne {
     private boolean titulaire;
     private Equipe equipe;
 
-    public Joueur(String nom, String prenom, int age, String poste, int numeroMaillot, boolean titulaire,
-            Equipe equipe) {
-        super(nom, prenom, age);
+    public Joueur(String nom, String prenom, int age, String poste, int numeroMaillot, boolean titulaire, Equipe equipe) { // Constructeur
+        super(nom, prenom, age); // Appel du constructeur de la classe mère
         this.poste = poste;
         this.numeroMaillot = numeroMaillot;
         this.titulaire = titulaire;
@@ -27,36 +37,12 @@ public class Joueur extends Personne {
         return numeroMaillot;
     }
 
-    public void setNumeroMaillot(int numeroMaillot) {
-        if (numeroMaillot <= 0) { // Vérifier que le numéro de maillot est positif
-            throw new IllegalArgumentException("Le numéro de maillot doit être positif.");
-        }
-        this.numeroMaillot = numeroMaillot;
-    }
-
     public boolean isTitulaire() {
         return titulaire;
     }
 
-    public void setTitulaire(boolean titulaire) {
-        if (titulairesMaxAtteint() && titulaire) {
-            throw new IllegalStateException("L'équipe a déjà atteint le nombre maximum de titulaires.");
-        }
-        this.titulaire = titulaire;
-    }
-
     public Equipe getEquipe() {
         return equipe;
-    }
-
-    public void setEquipe(Equipe equipe) {
-        if (this.equipe != null) {
-            this.equipe.retirerJoueur(this); // Retirer le joueur de l'équipe actuelle
-        }
-        this.equipe = equipe;
-        if (equipe != null) {
-            equipe.ajouterJoueur(this); // Ajouter le joueur à la nouvelle équipe
-        }
     }
 
     @Override
@@ -64,9 +50,5 @@ public class Joueur extends Personne {
         return super.toString() + ", equipe=" + (equipe != null ? equipe.getNom() : "Sans équipe")
                 + ", numeroMaillot=" + numeroMaillot
                 + ", poste=" + poste;
-    }
-
-    private boolean titulairesMaxAtteint() {
-        return equipe != null && equipe.getTitulaires().length == 11;
     }
 }

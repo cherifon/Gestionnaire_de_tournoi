@@ -1,3 +1,16 @@
+/*
+ * Projet : Gestionnaire de Tournoi
+ * Auteur : Cherif Jebali
+ * Date : 8 décembre  2024
+ * Description : Ce fichier fait partie du projet de gestion de tournoi.
+ *               Il contient la classe abstraite Personne qui représente une personne.
+ *               Cette classe est une classe parente pour les classes Joueur, Arbitre et Entraineur.
+ *               Elle contient les attributs nom, prenom et age.
+ * 
+ * Ce code a été écrit par Cherif Jebali pour le projet de gestion de tournoi.
+ * Vous pouvez utiliser ce code pour votre propre projet ou le modifier.
+ */
+
 package model;
 
 public abstract class Personne {
@@ -6,14 +19,13 @@ public abstract class Personne {
     private int age;
 
     protected Personne(String nom, String prenom, int age) {
-        if (nom == null || nom.trim().isEmpty()) { // Vérifier que le nom n'est pas vide (.trim() enlève les espaces en
-                                                   // début et fin de chaîne)
+        if (nom == null || nom.trim().isEmpty()) { // Vérifier que le nom n'est pas vide (.trim() enlève les espaces en début et fin de chaîne)
             throw new IllegalArgumentException("Le nom ne peut pas être vide.");
         }
-        if (prenom == null || prenom.trim().isEmpty()) {
+        if (prenom == null || prenom.trim().isEmpty()) { // Vérifier que le prénom n'est pas vide
             throw new IllegalArgumentException("Le prénom ne peut pas être vide.");
         }
-        if (age < 0) {
+        if (age < 0) { // Vérifier que l'âge est positif
             throw new IllegalArgumentException("L'âge doit être positif.");
         }
         this.nom = nom;
@@ -25,30 +37,12 @@ public abstract class Personne {
         return nom;
     }
 
-    public void setNom(String nom) {
-        if (nom == null || nom.trim().isEmpty()) {
-            throw new IllegalArgumentException("Le nom ne peut pas être vide.");
-        }
-        this.nom = nom;
-    }
-
     public String getPrenom() {
         return prenom;
     }
 
-    public void setPrenom(String prenom) {
-        this.prenom = prenom;
-    }
-
     public int getAge() {
         return age;
-    }
-
-    public void setAge(int age) {
-        if (age < 0) {
-            throw new IllegalArgumentException("L'âge doit être positif.");
-        }
-        this.age = age;
     }
 
     @Override

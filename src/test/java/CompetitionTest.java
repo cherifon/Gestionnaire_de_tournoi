@@ -1,3 +1,17 @@
+/*
+ * Projet : Gestionnaire de Tournoi
+ * Auteur : Cherif Jebali
+ * Date : 8 décembre  2024
+ * Description : Ce fichier fait partie du projet de gestion de tournoi.
+ *               Le fichier CompetitionTest est un fichier de test pour tester la classe Competition.
+ *               Il crée 16 équipes et une compétition et simule une compétition entre ces équipes.
+ *               Il affiche ensuite les statistiques de chaque équipe.
+ *         
+ * Ce code a été écrit par Cherif Jebali pour le projet de gestion de tournoi.
+ * Vous pouvez utiliser ce code pour votre propre projet ou le modifier.
+ */
+
+ // ################################ Imports ################################
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -6,10 +20,12 @@ import java.util.List;
 import model.Competition;
 import model.Equipe;
 import model.Joueur;
+// ################################ Imports ################################
 
 public class CompetitionTest {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) { // Méthode principale
+        // Créer 16 équipes avec 15 joueurs chacune
         Joueur[] joueurs1 = new Joueur[15];
         Joueur[] joueurs2 = new Joueur[15];
         Joueur[] joueurs3 = new Joueur[15];
@@ -27,7 +43,7 @@ public class CompetitionTest {
         Joueur[] joueurs15 = new Joueur[15];
         Joueur[] joueurs16 = new Joueur[15];
 
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < 15; i++) { // Créer 15 joueurs pour chaque équipe
             joueurs1[i] = new Joueur("Joueur1" + i, "Joueur1" + i, 20, "Attaquant", i + 1, true, null);
             joueurs2[i] = new Joueur("Joueur2" + i, "Joueur2" + i, 20, "Défenseur", i + 1, true, null);
             joueurs3[i] = new Joueur("Joueur3" + i, "Joueur3" + i, 20, "Milieu", i + 1, true, null);
@@ -45,7 +61,8 @@ public class CompetitionTest {
             joueurs15[i] = new Joueur("Joueur15" + i, "Joueur15" + i, 20, "Milieu", i + 1, true, null);
             joueurs16[i] = new Joueur("Joueur16" + i, "Joueur16" + i, 20, "Attaquant", i + 1, true, null);
         }
-
+        
+        // Créer les équipes
         Equipe equipe1 = new Equipe("Equipe1", joueurs1, null);
         Equipe equipe2 = new Equipe("Equipe2", joueurs2, null);
         Equipe equipe3 = new Equipe("Equipe3", joueurs3, null);
@@ -64,14 +81,13 @@ public class CompetitionTest {
         Equipe equipe16 = new Equipe("Equipe16", joueurs16, null);
 
         List<Equipe> equipes = Arrays.asList(equipe1, equipe2, equipe3, equipe4, equipe5, equipe6, equipe7, equipe8,
-                equipe9, equipe10, equipe11, equipe12, equipe13, equipe14, equipe15, equipe16);
+                equipe9, equipe10, equipe11, equipe12, equipe13, equipe14, equipe15, equipe16); // Liste des équipes
 
-        Competition competition = new Competition("Compétition de Test", equipes.toArray(new Equipe[0]), null);
-        competition.jouerCompetition(equipes);
+        Competition competition = new Competition("Compétition de Test", equipes.toArray(new Equipe[0]), null); // Créer une compétition
+        competition.jouerCompetition(equipes); // Jouer la compétition
 
         // Trier les équipes par ordre decroissant de victoires
-        Collections.sort(equipes, new Comparator<Equipe>() { // comparator est une interface qui permet de comparer deux
-                                                             // objets
+        Collections.sort(equipes, new Comparator<Equipe>() { // comparator est une interface qui permet de comparer deux objets
             @Override
             public int compare(Equipe equipe1, Equipe equipe2) { // compare est une méthode de l'interface Comparator
                 return equipe2.getVictoires() - equipe1.getVictoires(); // compare les victoires des deux équipes
