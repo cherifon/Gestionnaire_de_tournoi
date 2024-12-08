@@ -33,7 +33,7 @@ Il est important de noter que ce projet est un prototype. Il a été développé
 
 ### Équipes
 
-![Équipes](screenshots/ajouter_equipe.JPG)
+![Équipes](screenshots/ajouer_equipe.JPG)
 
 ### Joueurs
 
