@@ -6,7 +6,7 @@ Ce projet est un gestionnaire de tournoi développé en Java. Il permet de gére
 
 ### UML du Projet
 
-![UML](docs/ClasseUML.png)
+![UML](ClasseUML.png)
 
 ## Auteur
 
@@ -29,23 +29,23 @@ Il est important de noter que ce projet est un prototype. Il a été développé
 
 ### Compétitions
 
-![Compétition](docs/screenshots/competition.JPG)
+![Compétition](screenshots/competition.JPG)
 
 ### Équipes
 
-![Équipes](docs/screenshots/ajouter_equipe.JPG)
+![Équipes](screenshots/ajouter_equipe.JPG)
 
 ### Joueurs
 
-![Joueurs](docs/screenshots/ajouter_joueur.JPG)
+![Joueurs](screenshots/ajouter_joueur.JPG)
 
 ### Historique des Matchs
 
-![Matchs](docs/screenshots/historique_matchs.JPG)
+![Matchs](screenshots/historique_matchs.JPG)
 
 ### Base de Données
 
-![Base de Données](docs/screenshots/vue_bdd.JPG)
+![Base de Données](screenshots/vue_bdd.JPG)
 
 ## Fonctionnalités
 
